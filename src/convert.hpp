@@ -15,6 +15,7 @@ void convert_c_input(ostream &out, vector<Token> &tokens, int &id);
 
 void convert_c_if(ostream &out, vector<Token> &tokens, int &id);
 void convert_c_else(ostream &out, vector<Token> &tokens, int &id);
+void convert_c_elseif(ostream &out, vector<Token> &tokens, int &id);
 void convert_c_end(ostream &out, vector<Token> &tokens, int &id);
 
 void convert_c_while(ostream &out, vector<Token> &tokens, int &id);

@@ -1,4 +1,6 @@
-a = 10
-do
-a = b - 1
-loop until a <= 0
+INPUT a
+IF a > 0 THEN
+    PRINT "bigger!"
+ELSEIF a < 0 THEN
+    PRINT "smaller!"
+END IF

@@ -93,6 +93,13 @@ void convert_c_if(ostream &out, vector<Token> &tokens, int &id) {
     tag_stack.push(TAG_IF);
 }
 
+void convert_c_elseif(ostream &out, vector<Token> &tokens, int &id) {
+    string expr = converted_expr(tokens, id, [](Token &tok) -> bool {
+        return tok.is("THEN");
+    });
+    out << "}" << endl << "else if (" << expr << ") {" << endl;
+}
+
 void convert_c_else(ostream &out, vector<Token> &tokens, int &id) {
     if (tokens[++id].type() != EOL) {
         throw Error(tokens[id].line(), 0x6); // expected end of line
@@ -193,6 +200,8 @@ void convert_c(ostream &out, vector<Token> &tokens) {
             convert_c_if(buf, tokens, id);
         else if (tokens[id].is("ELSE"))
             convert_c_else(buf, tokens, id);
+        else if (tokens[id].is("ELSEIF"))
+            convert_c_elseif(buf, tokens, id);
         else if (tokens[id].is("WHILE"))
             convert_c_while(buf, tokens, id);
         else if (tokens[id].is("WEND"))
