@@ -55,12 +55,15 @@ void tokenize(vector<Token> &vec, string data) {
         }
         else if (data[i] == '\"') {
             for (i++; data[i] != '\"'; i++) {
-                if (i >= data.size())
+                if (i + 1 >= data.size())
                     throw Error(-1, 0x0); // unexpected end of file
                 token.push_back(data[i]);
             }
             vec.push_back(Token(line, STRING, token));
             token = "";
+        }
+        else if (data[i] == '\'') {
+            for (i++; i < data.size() && data[i] != '\n'; i++);
         }
         else if (delim(data[i])) {
             if (!token.empty())

@@ -1,3 +1,4 @@
+' a program to calc gcd
 input m, n
 r = m MOD n
 while r <> 0
