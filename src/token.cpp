@@ -3,9 +3,9 @@
 
 Token::Token(int line, TokenType type, string data) {
     if (type != STRING)
-        m_data = upper(data);
+        m_data = trim(upper(data));
     else
-        m_data = data;
+        m_data = trim(data);
     m_line = line;
     m_type = type;
 }

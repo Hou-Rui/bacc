@@ -29,12 +29,12 @@ int calc_level(string oper) {
 
 string converted_operation(string op, string lhs, string rhs) {
     if (op == "^") return string("pow(") + lhs + "," + rhs + ")";
-    if (op == "\\") return string("floor(") + lhs + "/" + rhs + "+0.00001)";
+    else if (op == "\\") return string("floor(") + lhs + "/" + rhs + "+0.00001)";
+    else if (op == "MOD") return string("(((int)(") + lhs + "+0.5))%((int)(" + rhs + "+0.5)))";
     else if (op == "AND") op = "&&";
     else if (op == "OR") op = "||";
     else if (op == "=") op = "==";
     else if (op == "<>") op = "!=";
-    else if (op == "MOD") op = "%";
     return string("(") + lhs + op + rhs + ")";
 }
 
@@ -63,6 +63,7 @@ string converted_expr(vector<Token> &tokens, int &id,
         }
         else {
             if (!isnumber(data[0]) && !has_decl(data)) {
+                cerr << "(" << trim(data) << ")" << endl;
                 throw Error(tokens[id].line(), 0xc); // undeclared variable
             }
             ovs.push(data);

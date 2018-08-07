@@ -7,3 +7,10 @@ string upper(const string& str) {
     }
     return result;
 }
+
+string trim(const string &str) {
+    static auto not_blank = [](char c) { return !isblank(c); };
+    auto right = std::find_if(str.rbegin(), str.rend(), not_blank).base();
+    auto left = std::find_if(str.begin(), right, not_blank);
+    return string(left, right);
+}
