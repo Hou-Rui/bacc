@@ -18,6 +18,8 @@ void Error::print() {
         ERR_CODE(0xa, "invalid expression")
         ERR_CODE(0xb, "ELSE without IF")
         ERR_CODE(0xc, "undeclared variable")
+        ERR_CODE(0xd, "unknown function")
+        default: message = "unknown error";
     }
     if (m_line != -1)
         cerr << "<line " << m_line << "> ";

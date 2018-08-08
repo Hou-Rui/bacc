@@ -1,6 +1,7 @@
 #include "convert.hpp"
 #include "expr.hpp"
 #include "decl.hpp"
+#include "func.hpp"
 #include "error.hpp"
 
 stack<StructTag> tag_stack;
@@ -190,6 +191,7 @@ void convert_c(ostream &out, vector<Token> &tokens) {
     stringstream buf;
     for (int id = 0; id < tokens.size(); id++) {
         //std::cout << to_string(tokens[id]) << endl;
+        add_function_decl();
         if (tokens[id].type() != NORMAL)
             continue;
         else if (tokens[id].is("PRINT")) 

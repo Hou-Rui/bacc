@@ -1,5 +1,6 @@
 #include "token.hpp"
 #include "decl.hpp"
+#include "func.hpp"
 #include "error.hpp"
 
 inline bool is_operator(string str) {
@@ -41,12 +42,19 @@ string converted_operation(string op, string lhs, string rhs) {
 string converted_expr(vector<Token> &tokens, int &id, 
     std::function<bool(Token &)> should_stop) {
     stack<string> ovs, ops;
+    bool may_call_function = false;
     for (id++; !should_stop(tokens[id - 1]); id++) {
         string data = tokens[id].data();
         if (data == "(") {
-            ovs.push(converted_expr(tokens, id, [](Token &tok) -> bool {
+            string expr = converted_expr(tokens, id, [](Token &tok) -> bool {
                 return tok.is(")");
-            }));
+            });
+            if (may_call_function) {
+                expr = converted_funcname(tokens[id].line(), ovs.top()) + "(" + expr + ")";
+                ovs.pop();
+            }
+            ovs.push(expr);
+            may_call_function = false;
         }
         else if (is_operator(data) || should_stop(tokens[id])) {
             while (!ops.empty() && 
@@ -58,15 +66,16 @@ string converted_expr(vector<Token> &tokens, int &id,
                 string lhs = ovs.top(); ovs.pop();
                 string op = ops.top(); ops.pop();
                 ovs.push(converted_operation(op, lhs, rhs));
+                may_call_function = false;
             }
             if (!should_stop(tokens[id])) ops.push(data);
         }
         else {
             if (!isnumber(data[0]) && !has_decl(data)) {
-                cerr << "(" << trim(data) << ")" << endl;
                 throw Error(tokens[id].line(), 0xc); // undeclared variable
             }
             ovs.push(data);
+            may_call_function = true;
         }
     }
     if (ovs.size() != 1 || !ops.empty()) {
