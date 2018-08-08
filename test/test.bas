@@ -1,9 +1,3 @@
-INPUT a
-IF a > 0 THEN
-    PRINT "bigger!"
-ELSEIF a < 0 THEN
-    PRINT "smaller!"
-ELSE
-    PRINT "exactly!"
-END IF
-PRINT ABS(a)
+FOR I = 1 TO 10 STEP 2
+    PRINT I * 2
+NEXT I

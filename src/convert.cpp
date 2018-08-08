@@ -5,6 +5,7 @@
 #include "error.hpp"
 
 stack<StructTag> tag_stack;
+stack<string> for_var_stack;
 
 void convert_c_prog_begin(ostream &out) {
     out << "#include <stdio.h>" << endl;
@@ -172,7 +173,47 @@ void convert_c_loop(ostream &out, vector<Token> &tokens, int &id) {
 }
 
 void convert_c_for(ostream &out, vector<Token> &tokens, int &id) {
-    
+    if (tokens[++id].type() != NORMAL) {
+        throw Error(tokens[id].line(), 0xe); // unexpected end of line
+    }
+    string for_var = tokens[id].data();
+    if (!has_decl(for_var)) add_decl(for_var);
+    if (!tokens[++id].is("=")) {
+        throw Error(tokens[id].line(), 0xf); // expected =
+    }
+    string from = converted_expr(tokens, id, [](Token &tok) -> bool {
+        return tok.is("TO");
+    });
+    string to = converted_expr(tokens, id, [](Token &tok) -> bool {
+        return tok.type() == EOL || tok.is("STEP");
+    });
+    string step = "1";
+    if (tokens[id].is("STEP")) {
+        step = converted_expr(tokens, id, [](Token &tok) -> bool {
+            return tok.type() == EOL;
+        });
+    }
+    tag_stack.push(TAG_FOR);
+    for_var_stack.push(for_var);
+    out << "for (" << for_var << "=" << from << "; ";
+    out << for_var << "<" << to << "+0.000001; ";
+    out << for_var << "+=" << step << ") {" << endl;
+}
+
+void convert_c_next(ostream &out, vector<Token> &tokens, int &id) {
+    if (tag_stack.empty() || tag_stack.top() != TAG_FOR) {
+        throw Error(tokens[id].line(), 0x10); // NEXT without FOR 
+    }
+    if (tokens[++id].type() != NORMAL) {
+        throw Error(tokens[id].line(), 0xe); // unexpected end of line
+    }
+    string for_var = tokens[id].data();
+    if (for_var != for_var_stack.top()) {
+        throw Error(tokens[id].line(), 0x11); // unmatched NEXT and FOR
+    }
+    for_var_stack.pop();
+    tag_stack.pop();
+    out << "}" << endl;
 }
 
 void convert_c_let(ostream &out, vector<Token> &tokens, int &id) {
@@ -214,6 +255,10 @@ void convert_c(ostream &out, vector<Token> &tokens) {
             convert_c_do(buf, tokens, id);
         else if (tokens[id].is("LOOP"))
             convert_c_loop(buf, tokens, id);
+        else if (tokens[id].is("FOR"))
+            convert_c_for(buf, tokens, id);
+        else if (tokens[id].is("NEXT"))
+            convert_c_next(buf, tokens, id);
         else
             convert_c_let(buf, tokens, id);
     }

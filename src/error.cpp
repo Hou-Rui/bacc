@@ -13,12 +13,16 @@ void Error::print() {
         ERR_CODE(0x5, "END IF without IF")
         ERR_CODE(0x6, "expected end of line")
         ERR_CODE(0x7, "WEND without WHILE")
-        ERR_CODE(0x8, "LOOP without DO ")
+        ERR_CODE(0x8, "LOOP without DO")
         ERR_CODE(0x9, "expected WHILE or LOOP")
         ERR_CODE(0xa, "invalid expression")
         ERR_CODE(0xb, "ELSE without IF")
         ERR_CODE(0xc, "undeclared variable")
         ERR_CODE(0xd, "unknown function")
+        ERR_CODE(0xe, "unexpected end of line")
+        ERR_CODE(0xf, "expected =")
+        ERR_CODE(0x10, "NEXT without FOR")
+        ERR_CODE(0x11, "unmatched NEXT and FOR")
         default: message = "unknown error";
     }
     if (m_line != -1)
