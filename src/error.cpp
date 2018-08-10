@@ -23,6 +23,8 @@ void Error::print() {
         ERR_CODE(0xf, "expected =")
         ERR_CODE(0x10, "NEXT without FOR")
         ERR_CODE(0x11, "unmatched NEXT and FOR")
+        ERR_CODE(0x12, "unmatched EXIT")
+        ERR_CODE(0x13, "expected DO or WHILE or FOR")
         default: message = "unknown error";
     }
     if (m_line != -1)

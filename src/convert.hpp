@@ -27,6 +27,8 @@ void convert_c_loop(ostream &out, vector<Token> &tokens, int &id);
 void convert_c_for(ostream &out, vector<Token> &tokens, int &id);
 void convert_c_next(ostream &out, vector<Token> &tokens, int &id);
 
+void convert_c_exit(ostream &out, vector<Token> &tokens, int &id);
+
 void convert_c_let(ostream &out, vector<Token> &tokens, int &id);
 
 void convert_c(ostream &out, vector<Token> &tokens);

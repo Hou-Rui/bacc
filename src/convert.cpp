@@ -216,6 +216,41 @@ void convert_c_next(ostream &out, vector<Token> &tokens, int &id) {
     out << "}" << endl;
 }
 
+void convert_c_exit(ostream &out, vector<Token> &tokens, int &id) {
+    id++;
+    int if_cnt = 0;
+    while (!tag_stack.empty() && tag_stack.top() == TAG_IF) {
+        if_cnt++;
+        tag_stack.pop();
+    }
+    if (tag_stack.empty()) {
+        throw Error(tokens[id].line(), 0x12); // unmatched EXIT
+    }
+    if (tokens[id].is("DO")) {
+        if (tag_stack.top() != TAG_DO) {
+            throw Error(tokens[id].line(), 0x12); // unmatched EXIT
+        }
+        out << "break;" << endl;
+    }
+    else if (tokens[id].is("WHILE")) {
+        if (tag_stack.top() != TAG_WHILE) {
+            throw Error(tokens[id].line(), 0x12); // unmatched EXIT
+        }
+        out << "break;" << endl;
+    }
+    else if (tokens[id].is("FOR")) {
+        if (tag_stack.top() != TAG_FOR) {
+            throw Error(tokens[id].line(), 0x12); // unmatched EXIT
+        }
+        out << "break;" << endl;
+    }
+    else {
+        throw Error(tokens[id].line(), 0x13); // expected DO or WHILE or FOR
+    }
+    for (int i = 0 ; i < if_cnt; i++)
+        tag_stack.push(TAG_IF);
+}
+
 void convert_c_let(ostream &out, vector<Token> &tokens, int &id) {
     if (tokens[id].type() != NORMAL || !tokens[id + 1].is("=")) {
         throw Error(tokens[id].line(), 0x4); // expected expression
@@ -259,6 +294,8 @@ void convert_c(ostream &out, vector<Token> &tokens) {
             convert_c_for(buf, tokens, id);
         else if (tokens[id].is("NEXT"))
             convert_c_next(buf, tokens, id);
+        else if (tokens[id].is("EXIT"))
+            convert_c_exit(buf, tokens, id);
         else
             convert_c_let(buf, tokens, id);
     }

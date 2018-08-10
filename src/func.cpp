@@ -10,7 +10,7 @@
     REGISTER_FUNCTION(ATN, atan) \
     REGISTER_FUNCTION(EXP, exp) \
     REGISTER_FUNCTION(LOG, log) \
-    REGISTER_FUNCTION(SQR, sqrt) \
+    REGISTER_FUNCTION(SQR, sqrt)
 
 void add_function_decl() {
     #define REGISTER_FUNCTION(basic_function, c_function) \
