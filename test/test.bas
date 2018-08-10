@@ -1,7 +1,9 @@
-DIM A(5)
-SUM = 0
-FOR I = 1 TO 5
-    INPUT "I=?"; A(I)
-    SUM = SUM + A(I)
+DIM FIB(100)
+FIB(1) = 1
+FIB(2) = 1
+FOR I = 3 TO 100
+    FIB(I) = FIB(I - 1) + FIB(I - 2)
 NEXT I
-PRINT SUM
+FOR I = 1 TO 100
+    PRINT FIB(I)
+NEXT I

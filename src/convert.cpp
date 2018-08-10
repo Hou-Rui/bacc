@@ -48,8 +48,8 @@ void convert_c_print(ostream &out, vector<Token> &tokens, int &id) {
                     return tok.type() == EOL;
                 });
                 id--;
-                out << "if (fabs((int)((" << expr << ")+0.5)-" << expr << ") < 0.000001)" << endl;
-                out << "printf(\"%d\",(int)((" << expr << ")+0.5));" << endl;
+                out << "if (fabs(floor((" << expr << ")+0.5)-" << expr << ") < 0.00001)" << endl;
+                out << "printf(\"%.0f\",floor((" << expr << ")+0.5));" << endl;
                 out << "else printf(\"%.4f\"," << expr << ");" << endl;
                 expect_comma = true;
             }
@@ -285,16 +285,26 @@ void convert_c_exit(ostream &out, vector<Token> &tokens, int &id) {
 }
 
 void convert_c_let(ostream &out, vector<Token> &tokens, int &id) {
-    if (tokens[id].type() != NORMAL || !tokens[id + 1].is("=")) {
+    if (tokens[id].type() != NORMAL 
+        || (!tokens[id + 1].is("=") && !tokens[id + 1].is("("))) {
         throw Error(tokens[id].line(), 0x4); // expected expression
     }
     string name = tokens[id].data();
+    if (has_decl(array_decl(), name)) {
+        if (!tokens[++id].is("(")) {
+            throw Error(tokens[id].line(), 0x17); // expected (
+        }
+        string index = converted_expr(tokens, id, [](Token &tok) -> bool {
+            return tok.is(")");
+        });
+        name += string("[") + "((int)(" + index + "+0.5))" + "-1]";
+    }
+    else if (!has_decl(var_decl(), name)) {
+        add_decl(var_decl(), name);
+    }
     string expr = converted_expr(tokens, ++id, [](Token &tok) -> bool {
         return tok.type() == EOL;
     });
-    if (!has_decl(var_decl(), name)) {
-        add_decl(var_decl(), name);
-    }
     out << name << "=" << expr << ";" << endl;
 }
 
