@@ -12,7 +12,7 @@ void convert_c_prog_begin(ostream &out) {
     out << "#include <stdlib.h>" << endl;
     out << "#include <math.h>" << endl;
     out << "int main() {" << endl;
-    for (auto &name : decl()) {
+    for (auto &name : var_decl()) {
         out << "double " << name << ";" << endl;
     }
 }
@@ -58,6 +58,23 @@ void convert_c_print(ostream &out, vector<Token> &tokens, int &id) {
     out << "printf(\"\\n\");" << endl;
 }
 
+void convert_c_dim(ostream &out, vector<Token> &tokens, int &id) {
+    string name = tokens[++id].data();
+    if (tokens[++id].type() == EOL) {
+        add_decl(var_decl(), name);
+    }
+    else if (tokens[id].is("(")) {
+        string size = tokens[++id].data();
+        if (!isnumber(size)) {
+            throw Error(tokens[id].line(), 0x15); // expected a number
+        }
+        if (!tokens[++id].is(")")) {
+            throw Error(tokens[id].line(), 0x16); // expected )
+        }
+        add_array_decl(name, size);
+    }
+}
+
 void convert_c_input(ostream &out, vector<Token> &tokens, int &id) {
     bool expect_comma = false;
     for (id++; tokens[id].type() != EOL; id++) {
@@ -79,7 +96,18 @@ void convert_c_input(ostream &out, vector<Token> &tokens, int &id) {
             else {
                 if (expect_comma) throw Error(tokens[id].line(), 0x1); // expected , or ;
                 string name = tokens[id].data();
-                add_decl(name);
+                if (has_decl(array_decl(), name)) {
+                    if (!tokens[++id].is("(")) {
+                        throw Error(tokens[id].line(), 0x17); // expected (
+                    }
+                    string index = converted_expr(tokens, id, [](Token &tok) -> bool {
+                        return tok.is(")");
+                    });
+                    name += string("[") + "((int)(" + index + "+0.5))" + "-1]";
+                }
+                else if (!has_decl(var_decl(), name)) {
+                    add_decl(var_decl(), name);
+                }
                 out << "scanf(\"%lf\", &" << name << ");" << endl;
                 expect_comma = true;
             }
@@ -142,7 +170,10 @@ void convert_c_end(ostream &out, vector<Token> &tokens, int &id) {
         }
         tag_stack.pop();
         out << "}" << endl;
-    } 
+    }
+    else {
+        throw Error(tokens[id].line(), 0x14); // expected IF or end of line
+    }
 }
 
 void convert_c_do(ostream &out, vector<Token> &tokens, int &id) {
@@ -177,7 +208,9 @@ void convert_c_for(ostream &out, vector<Token> &tokens, int &id) {
         throw Error(tokens[id].line(), 0xe); // unexpected end of line
     }
     string for_var = tokens[id].data();
-    if (!has_decl(for_var)) add_decl(for_var);
+    if (!has_decl(var_decl(), for_var)) {
+        add_decl(var_decl(), for_var);
+    }
     if (!tokens[++id].is("=")) {
         throw Error(tokens[id].line(), 0xf); // expected =
     }
@@ -259,7 +292,9 @@ void convert_c_let(ostream &out, vector<Token> &tokens, int &id) {
     string expr = converted_expr(tokens, ++id, [](Token &tok) -> bool {
         return tok.type() == EOL;
     });
-    if (!has_decl(name)) add_decl(name);
+    if (!has_decl(var_decl(), name)) {
+        add_decl(var_decl(), name);
+    }
     out << name << "=" << expr << ";" << endl;
 }
 
@@ -267,13 +302,15 @@ void convert_c(ostream &out, vector<Token> &tokens) {
     stringstream buf;
     for (int id = 0; id < tokens.size(); id++) {
         //std::cout << to_string(tokens[id]) << endl;
-        add_function_decl();
+        declare_functions();
         if (tokens[id].type() != NORMAL)
             continue;
         else if (tokens[id].is("PRINT")) 
             convert_c_print(buf, tokens, id);
         else if (tokens[id].is("INPUT"))
             convert_c_input(buf, tokens, id);
+        else if (tokens[id].is("DIM"))
+            convert_c_dim(buf, tokens, id);
         else if (tokens[id].is("IF"))
             convert_c_if(buf, tokens, id);
         else if (tokens[id].is("ELSE"))

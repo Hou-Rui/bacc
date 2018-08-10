@@ -14,3 +14,10 @@ string trim(const string &str) {
     auto left = std::find_if(str.begin(), right, not_blank);
     return string(left, right);
 }
+
+bool isnumber(const string &str) {
+    for (int i = 0; i < str.size(); i++) {
+        if (!isnumber(str[i])) return false;
+    }
+    return true;
+}

@@ -10,6 +10,8 @@ enum StructTag {
 void convert_c_prog_begin(ostream &out);
 void convert_c_prog_end(ostream &out);
 
+void convert_c_dim(ostream &out, vector<Token> &tokens, int &id);
+
 void convert_c_print(ostream &out, vector<Token> &tokens, int &id);
 void convert_c_input(ostream &out, vector<Token> &tokens, int &id);
 

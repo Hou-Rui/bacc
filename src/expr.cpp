@@ -42,19 +42,22 @@ string converted_operation(string op, string lhs, string rhs) {
 string converted_expr(vector<Token> &tokens, int &id, 
     std::function<bool(Token &)> should_stop) {
     stack<string> ovs, ops;
-    bool may_call_function = false;
+    bool func_or_array = false;
     for (id++; !should_stop(tokens[id - 1]); id++) {
         string data = tokens[id].data();
         if (data == "(") {
             string expr = converted_expr(tokens, id, [](Token &tok) -> bool {
                 return tok.is(")");
             });
-            if (may_call_function) {
-                expr = converted_funcname(tokens[id].line(), ovs.top()) + "(" + expr + ")";
+            if (func_or_array) {
+                if (has_decl(func_decl(), ovs.top()))
+                    expr = converted_funcname(tokens[id].line(), ovs.top()) + "(" + expr + ")";
+                else if (has_decl(array_decl(), ovs.top()))
+                    expr = ovs.top() + "[" + "((int)(" + expr + "+0.5))" + "-1]";
                 ovs.pop();
             }
             ovs.push(expr);
-            may_call_function = false;
+            func_or_array = false;
         }
         else if (is_operator(data) || should_stop(tokens[id])) {
             while (!ops.empty() && 
@@ -66,7 +69,7 @@ string converted_expr(vector<Token> &tokens, int &id,
                 string lhs = ovs.top(); ovs.pop();
                 string op = ops.top(); ops.pop();
                 ovs.push(converted_operation(op, lhs, rhs));
-                may_call_function = false;
+                func_or_array = false;
             }
             if (!should_stop(tokens[id])) ops.push(data);
         }
@@ -75,7 +78,7 @@ string converted_expr(vector<Token> &tokens, int &id,
                 throw Error(tokens[id].line(), 0xc); // undeclared variable
             }
             ovs.push(data);
-            may_call_function = true;
+            func_or_array = true;
         }
     }
     if (ovs.size() != 1 || !ops.empty()) {

@@ -12,9 +12,9 @@
     REGISTER_FUNCTION(LOG, log) \
     REGISTER_FUNCTION(SQR, sqrt)
 
-void add_function_decl() {
+void declare_functions() {
     #define REGISTER_FUNCTION(basic_function, c_function) \
-        add_decl(#basic_function);
+        add_decl(func_decl(), #basic_function);
     REGISTER_FUNCTIONS
     #undef REGISTER_FUNCTION
 }

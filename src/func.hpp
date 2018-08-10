@@ -3,7 +3,7 @@
 
 #include "general.hpp"
 
-void add_function_decl();
+void declare_functions();
 string converted_funcname(int line, string funcname);
 
 

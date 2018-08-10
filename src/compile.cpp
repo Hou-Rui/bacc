@@ -13,9 +13,9 @@ void compile_to_c(const string &prog_name) {
     try {
         convert_c(fout, tokens);
     }
-    catch (Error err) {
+    catch (Error &err) {
         err.print();
-        exit(0);
+        exit(1);
     }
     fin.close(); fout.close();
 }
