@@ -11,6 +11,9 @@ void convert_c_prog_begin(ostream &out) {
     out << "#include <stdio.h>" << endl;
     out << "#include <stdlib.h>" << endl;
     out << "#include <math.h>" << endl;
+    for (auto &impl : func_impl()) {
+        out << impl;
+    }
     out << "int main() {" << endl;
     for (auto &name : var_decl()) {
         out << "double " << name << ";" << endl;
@@ -310,9 +313,9 @@ void convert_c_let(ostream &out, vector<Token> &tokens, int &id) {
 
 void convert_c(ostream &out, vector<Token> &tokens) {
     stringstream buf;
+    declare_functions();
     for (int id = 0; id < tokens.size(); id++) {
         //std::cout << to_string(tokens[id]) << endl;
-        declare_functions();
         if (tokens[id].type() != NORMAL)
             continue;
         else if (tokens[id].is("PRINT")) 

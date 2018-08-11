@@ -3,6 +3,7 @@
 set<string> m_var_decl;
 set<string> m_func_decl;
 set<string> m_array_decl;
+vector<string> m_func_impl;
 
 set<string> &var_decl() {
     return m_var_decl;
@@ -14,6 +15,14 @@ set<string> &func_decl() {
 
 set<string> &array_decl() {
     return m_array_decl;
+}
+
+vector<string> &func_impl() {
+    return m_func_impl;
+}
+
+void add_func_impl(string impl) {
+    m_func_impl.push_back(impl);
 }
 
 void add_decl(set<string> &decl, string name) {

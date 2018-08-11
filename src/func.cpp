@@ -1,32 +1,30 @@
 #include "decl.hpp"
 #include "error.hpp"
 
-#define REGISTER_FUNCTIONS \
-    REGISTER_FUNCTION(ABS, fabs) \
-    REGISTER_FUNCTION(INT, floor) \
-    REGISTER_FUNCTION(SIN, sin) \
-    REGISTER_FUNCTION(COS, cos) \
-    REGISTER_FUNCTION(TAN, tan) \
-    REGISTER_FUNCTION(ATN, atan) \
-    REGISTER_FUNCTION(EXP, exp) \
-    REGISTER_FUNCTION(LOG, log) \
-    REGISTER_FUNCTION(SQR, sqrt)
+map<string, string> basic_to_c;
 
 void declare_functions() {
-    #define REGISTER_FUNCTION(basic_function, c_function) \
-        add_decl(func_decl(), #basic_function);
-    REGISTER_FUNCTIONS
-    #undef REGISTER_FUNCTION
+    std::ifstream fin("res/functions.c");
+    string line, basic_func_name, c_func_name;
+    while (std::getline(fin, line)) {
+        if (line == "// bacc begin") {
+            std::getline(fin, line);
+            sscanf("%s => %s", basic_func_name.c_str(), c_func_name.c_str());
+            basic_to_c[basic_func_name] = c_func_name;
+            stringstream ss;
+            while (std::getline(fin, line) && line != "// bacc end") {
+                if (!line.empty())
+                    ss << line << endl;
+            }
+            add_func_impl(ss.str());
+        }
+    }
 }
 
 string converted_funcname(int line, string funcname) {
-    #define REGISTER_FUNCTION(basic_function, c_function) \
-        if (funcname == #basic_function) { \
-            return #c_function; \
-        }
-    REGISTER_FUNCTIONS
-    throw Error(line, 0xd); // unknown function
-    #undef REGISTER_FUNCTION
+    if (basic_to_c.count(funcname) < 1) {
+        throw Error(line, 0xd); // unknown function
+    }
+    return basic_to_c[funcname];
 }
 
-#undef REGISTER_FUNCTIONS

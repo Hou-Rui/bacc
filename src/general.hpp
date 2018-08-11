@@ -11,11 +11,13 @@
 #include <set>
 #include <stack>
 #include <functional>
+#include <map>
 
 using std::string;
 using std::stringstream;
 using std::ostream;
 using std::vector;
+using std::map;
 using std::stack;
 using std::cerr;
 using std::endl;
