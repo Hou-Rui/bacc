@@ -74,7 +74,7 @@ string converted_expr(vector<Token> &tokens, int &id,
             if (!should_stop(tokens[id])) ops.push(data);
         }
         else {
-            if (!isnumber(data[0]) && !has_decl(data)) {
+            if (!is_number(data) && !has_decl(data)) {
                 throw Error(tokens[id].line(), 0xc); // undeclared variable
             }
             ovs.push(data);

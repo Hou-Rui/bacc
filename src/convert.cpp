@@ -68,7 +68,7 @@ void convert_c_dim(ostream &out, vector<Token> &tokens, int &id) {
     }
     else if (tokens[id].is("(")) {
         string size = tokens[++id].data();
-        if (!isnumber(size)) {
+        if (!is_number(size)) {
             throw Error(tokens[id].line(), 0x15); // expected a number
         }
         if (!tokens[++id].is(")")) {
@@ -290,6 +290,7 @@ void convert_c_exit(ostream &out, vector<Token> &tokens, int &id) {
 void convert_c_let(ostream &out, vector<Token> &tokens, int &id) {
     if (tokens[id].type() != NORMAL 
         || (!tokens[id + 1].is("=") && !tokens[id + 1].is("("))) {
+        cerr << tokens[id + 1].data() << endl;
         throw Error(tokens[id].line(), 0x4); // expected expression
     }
     string name = tokens[id].data();

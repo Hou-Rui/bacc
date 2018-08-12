@@ -15,9 +15,21 @@ string trim(const string &str) {
     return string(left, right);
 }
 
-bool isnumber(const string &str) {
+bool is_number(const string &str) {
     for (int i = 0; i < str.size(); i++) {
         if (!isnumber(str[i])) return false;
     }
     return true;
+}
+
+bool is_alpha(const string &str) {
+    for (int i = 0; i < str.size(); i++) {
+        if (!isalpha(str[i]) && str[i] != '$' && str[i] != '_')
+            return false;
+    }
+    return true;
+}
+
+bool start_with(const string &str, const string &prefix) {
+    return str.find(prefix) == 0;
 }

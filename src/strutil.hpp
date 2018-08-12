@@ -5,7 +5,9 @@
 
 string upper(const string &str);
 string trim(const string &str);
-bool isnumber(const string &str);
+bool is_number(const string &str);
+bool is_alpha(const string &str);
+bool start_with(const string &str, const string &prefix);
 
 template <typename Tp> string to_string(Tp x) {
     stringstream ss;

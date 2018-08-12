@@ -10,12 +10,18 @@ Token::Token(int line, TokenType type, string data) {
     m_type = type;
 }
 string Token::data() const {
-        return m_data;
+    return m_data;
 }
 
 bool Token::is(const string &data) const {
-        return m_data == data;
+    string new_data = data, new_m_data = m_data;
+    if (!start_with(new_data, "_BASIC_"))
+        new_data = "_BASIC_" + new_data;
+    if (!start_with(new_m_data, "_BASIC_"))
+        new_m_data = "_BASIC_" + new_m_data;
+    return new_m_data == new_data;
 }
+
 TokenType Token::type() const {
     return m_type;
 }
@@ -43,13 +49,20 @@ bool delim(char c) {
     return false;
 }
 
+string converted_decl(string name) {
+    if (is_alpha(name)) {
+        return "_basic_" + name;
+    }
+    return name;
+}
+
 void tokenize(vector<Token> &vec, string data) {
     string token = "";
     int line = 1;
     for (int i = 0; i < data.size(); i++) {
         if (data[i] == '\n') {
             if (!token.empty())
-                vec.push_back(Token(line, NORMAL, token));
+                vec.push_back(Token(line, NORMAL, converted_decl(token)));
             vec.push_back(Token(line++, EOL));
             token = "";
         }
@@ -67,7 +80,7 @@ void tokenize(vector<Token> &vec, string data) {
         }
         else if (delim(data[i])) {
             if (!token.empty())
-                vec.push_back(Token(line, NORMAL, token));
+                vec.push_back(Token(line, NORMAL, converted_decl(token)));
             token = "";
             if (isspace(data[i])) 
                 continue;
@@ -75,7 +88,7 @@ void tokenize(vector<Token> &vec, string data) {
                 token += data[i];
             }
             i--;
-            vec.push_back(Token(line, NORMAL, token));
+            vec.push_back(Token(line, NORMAL, converted_decl(token)));
             token = "";
         }
         else {
@@ -83,7 +96,7 @@ void tokenize(vector<Token> &vec, string data) {
         }
     }
     if (!token.empty())
-        vec.push_back(Token(line, NORMAL, token));
+        vec.push_back(Token(line, NORMAL, converted_decl(token)));
     vec.push_back(Token(line, EOL));
     vec.push_back(Token(line, EOF));
 }
