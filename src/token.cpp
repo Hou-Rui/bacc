@@ -51,7 +51,7 @@ bool delim(char c) {
 
 string converted_decl(string name) {
     if (is_alpha(name)) {
-        return "_basic_" + name;
+        return "_BASIC_" + name;
     }
     return name;
 }

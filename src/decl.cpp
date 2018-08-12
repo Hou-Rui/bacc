@@ -26,6 +26,9 @@ void add_func_impl(string impl) {
 }
 
 void add_decl(set<string> &decl, string name) {
+    if (decl == func_decl()) {
+        //cerr << "declare " << name << endl;
+    }
     decl.insert(name);
 }
 

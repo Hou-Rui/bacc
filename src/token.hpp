@@ -24,6 +24,7 @@ public:
 stringstream &operator<<(stringstream &ss, Token &tok);
 
 bool delim(char c);
+string converted_decl(string name);
 void tokenize(vector<Token> &vec, string data);
 
 #endif /* TOKEN_HPP */
