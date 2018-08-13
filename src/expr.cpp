@@ -4,7 +4,10 @@
 #include "error.hpp"
 
 inline bool is_operator(string str) {
-    return delim(str[0]) || str == "AND" || str == "OR" || str == "MOD";
+    return delim(str[0])
+    || str == converted_decl("AND")
+    || str == converted_decl("OR")
+    || str == converted_decl("MOD");
 }
 
 int calc_level(string oper) {
@@ -31,9 +34,9 @@ int calc_level(string oper) {
 string converted_operation(string op, string lhs, string rhs) {
     if (op == "^") return string("pow(") + lhs + "," + rhs + ")";
     else if (op == "\\") return string("floor(") + lhs + "/" + rhs + "+0.00001)";
-    else if (op == "MOD") return string("(((int)(") + lhs + "+0.5))%((int)(" + rhs + "+0.5)))";
-    else if (op == "AND") op = "&&";
-    else if (op == "OR") op = "||";
+    else if (op == converted_decl("MOD")) return string("(((int)(") + lhs + "+0.5))%((int)(" + rhs + "+0.5)))";
+    else if (op == converted_decl("AND")) op = "&&";
+    else if (op == converted_decl("OR")) op = "||";
     else if (op == "=") op = "==";
     else if (op == "<>") op = "!=";
     return string("(") + lhs + op + rhs + ")";
