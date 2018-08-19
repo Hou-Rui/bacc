@@ -7,8 +7,6 @@ map<string, string> basic_to_c;
 void declare_functions() {
     std::ifstream fin("res/functions.c");
     string line, basic_func_name, c_func_name;
-    basic_func_name.resize(0xff);
-    c_func_name.resize(0xff);
     while (std::getline(fin, line)) {
         if (line == "// bacc begin") {
             std::getline(fin, line);
